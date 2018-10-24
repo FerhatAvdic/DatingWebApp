@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using API.Data;
 using API.Dtos;
 using API.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -18,9 +19,11 @@ namespace API.Controllers
   {
     private readonly IAuthRepository _repo;
     private readonly IConfiguration _config;
+    private readonly IMapper _mapper;
 
-    public AuthController(IAuthRepository repo, IConfiguration config)
+    public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
     {
+      _mapper = mapper;
       _config = config;
       _repo = repo;
     }
@@ -60,9 +63,10 @@ namespace API.Controllers
 
       var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-      var tokenDescriptor = new SecurityTokenDescriptor{
-          Subject = new ClaimsIdentity(claims),
-          Expires = System.DateTime.Now.AddDays(1),
+      var tokenDescriptor = new SecurityTokenDescriptor
+      {
+        Subject = new ClaimsIdentity(claims),
+        Expires = System.DateTime.Now.AddDays(1),
         SigningCredentials = creds
       };
 
@@ -70,8 +74,12 @@ namespace API.Controllers
 
       var token = tokenHandler.CreateToken(tokenDescriptor);
 
-      return Ok(new {
-          token = tokenHandler.WriteToken(token)
+      var user = _mapper.Map<UserForListDto>(userFromRepo);
+
+      return Ok(new
+      {
+        token = tokenHandler.WriteToken(token),
+        user
       });
     }
   }

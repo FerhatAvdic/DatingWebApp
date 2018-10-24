@@ -16,6 +16,7 @@
       </ul>
       
       <div *ngIf="loggedIn()" class="dropdown" dropdown>
+        
         <a class="dropdown-toggle text-light" dropdownToggle>
           Welcome {{authService.decodedToken?.unique_name | titlecase}}
         </a>
@@ -24,6 +25,9 @@
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" (click)="logout()"><i class="fa fa-sign-out"></i> Logout</a>
         </div>
+        <span class="ml-3">
+          <img src="{{photoUrl}}" alt="">
+        </span>
       </div>
       
       <form *ngIf="!loggedIn()" #loginForm="ngForm" class="form-inline my-2 my-lg-0" (ngSubmit)="login()">
